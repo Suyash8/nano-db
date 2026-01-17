@@ -18,4 +18,21 @@ public:
             bit_count_ = 0;
         }
     }
+
+    void writeBits(uint64_t value, int num_bits) {
+        for (int i = num_bits - 1; i >= 0; --i)
+            writeBit((value >> i) & 1);
+    }
+
+    void flush() {
+        if (bit_count_ > 0) {
+            buffer_.push_back(scratch_);
+            scratch_ = 0;
+            bit_count_ = 0;
+        }
+    }
+
+    const std::vector<uint8_t>& getData() const {
+        return buffer_;
+    }
 };

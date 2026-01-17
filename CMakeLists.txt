@@ -15,6 +15,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(nanodb_tests 
     tests/test_main.cpp
     tests/test_simple_ts.cpp
+    tests/test_bit_writer.cpp
 )
 
 target_include_directories(nanodb_tests PRIVATE include)
