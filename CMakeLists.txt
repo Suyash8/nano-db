@@ -12,5 +12,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(nanodb_tests tests/test_main.cpp)
+add_executable(nanodb_tests 
+    tests/test_main.cpp
+    tests/test_simple_ts.cpp
+)
+
+target_include_directories(nanodb_tests PRIVATE include)
+
 target_link_libraries(nanodb_tests gtest_main)
