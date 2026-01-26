@@ -17,6 +17,8 @@ add_executable(nanodb_tests
     tests/test_simple_ts.cpp
     tests/test_bit_writer.cpp
     tests/test_bit_reader.cpp
+    tests/test_timestamp_compression.cpp
+    tests/test_timestamp_decompression.cpp
 )
 
 target_include_directories(nanodb_tests PRIVATE include)

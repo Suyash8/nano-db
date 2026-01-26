@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
+#include <vector>
 
-#include "nanodb/bit_writer.hpp"
 #include "nanodb/bit_reader.hpp"
+#include "nanodb/bit_writer.hpp"
 
 TEST(BitReader, ReadSingleBits) {
     std::vector<uint8_t> data = {0b10110010};
