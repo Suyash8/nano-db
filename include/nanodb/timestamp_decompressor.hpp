@@ -1,6 +1,8 @@
 #pragma once
 
-#include "nanodb/bit_reader.hpp"
+#include <cstdint>
+
+#include "bit_reader.hpp"
 
 class TimestampDecompressor {
     BitReader& reader_;

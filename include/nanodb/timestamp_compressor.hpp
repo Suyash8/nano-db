@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdexcept>
+#include <cstdint>
 
 #include "bit_writer.hpp"
 

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "nanodb/bit_writer.hpp"
 #include "nanodb/timestamp_compressor.hpp"
 
 TEST(TimestampCompressor, CompressesRegularIntervals) {
