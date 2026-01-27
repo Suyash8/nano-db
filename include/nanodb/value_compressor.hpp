@@ -2,7 +2,6 @@
 
 #include <bit>
 #include <cstdint>
-#include <stdexcept>
 
 #include "bit_writer.hpp"
 #include "utils.hpp"
