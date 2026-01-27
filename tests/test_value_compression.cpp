@@ -1,4 +1,6 @@
+#include <cstdint>
 #include <gtest/gtest.h>
+#include <vector>
 
 #include "nanodb/bit_reader.hpp"
 #include "nanodb/bit_writer.hpp"
