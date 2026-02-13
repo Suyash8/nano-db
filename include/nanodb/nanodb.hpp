@@ -1,6 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <fstream>
+#include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -42,6 +45,58 @@ public:
         }
 
         return result;
+    }
+
+    void save(std::string& filename) {
+        std::ofstream file(filename, std::ios::binary);
+
+        file.write("NANO", 4);
+
+        size_t size = blocks_.size();
+        file.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+        for (auto &block : blocks_) {
+            int64_t start_time = block.getStartTime();
+            file.write(reinterpret_cast<const char*>(&start_time), sizeof(start_time));
+
+            int64_t end_time = block.getEndTime();
+            file.write(reinterpret_cast<const char*>(&end_time), sizeof(end_time));
+
+            int64_t count = block.getCount();
+            file.write(reinterpret_cast<const char*>(&count), sizeof(count));
+
+            int64_t data_size = block.getSize();
+            file.write(reinterpret_cast<const char*>(&data_size), sizeof(data_size));
+
+            file.write(reinterpret_cast<const char*>(block.getData().data()), data_size);
+        }
+    }
+
+    void load(std::string& filename) {
+        std::ifstream file(filename, std::ios::binary);
+
+        if (!file.is_open()) throw std::runtime_error("Could not open file");
+
+        char magic[4];
+        file.read(magic, 4);
+        if (std::string(magic, 4) != "NANO") throw std::runtime_error("Invalid file format");
+
+        size_t count;
+        file.read(reinterpret_cast<char*>(&count), sizeof(count));
+        // blocks_.clear();
+
+        for (size_t i = 0; i < count; ++i) {
+            int64_t start_time, end_time, point_count, data_size;
+            file.read(reinterpret_cast<char*>(&start_time), sizeof(start_time));
+            file.read(reinterpret_cast<char*>(&end_time), sizeof(end_time));
+            file.read(reinterpret_cast<char*>(&point_count), sizeof(point_count));
+            file.read(reinterpret_cast<char*>(&data_size), sizeof(data_size));
+
+            std::vector<uint8_t> data(data_size);
+            file.read(reinterpret_cast<char*>(data.data()), data_size);
+
+            blocks_.emplace_back(start_time, end_time, point_count, data);
+        }
     }
 
     size_t getBlockCount() { return blocks_.size(); }
