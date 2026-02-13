@@ -34,7 +34,6 @@ public:
         }
     }
 
-    const std::vector<uint8_t>& getData() const {
-        return buffer_;
-    }
+    const std::vector<uint8_t>& getData() const { return buffer_; }
+    void setData(std::vector<uint8_t> d) { buffer_ = d; }
 };
