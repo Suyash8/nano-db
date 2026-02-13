@@ -20,6 +20,7 @@ add_executable(nanodb_tests
     tests/test_timestamp_compression.cpp
     tests/test_timestamp_decompression.cpp
     tests/test_value_compression.cpp
+    tests/test_time_series_block.cpp
 )
 
 target_include_directories(nanodb_tests PRIVATE include)
