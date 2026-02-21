@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <stdexcept>
@@ -29,16 +30,22 @@ public:
     std::vector<std::pair<int64_t, double>> query(int64_t start, int64_t end) {
         std::vector<std::pair<int64_t, double>> result;
 
-        for (auto &block : blocks_) {
-            if (block.getEndTime() < start) continue;
+        auto it = std::lower_bound(blocks_.begin(), blocks_.end(), start, 
+            [](TimeSeriesBlock& block, int64_t val) {
+                return block.getEndTime() < val; 
+            });
+
+        for (; it != blocks_.end(); ++it) {
+            auto& block = *it;
+
             if (block.getStartTime() > end) break;
 
-            BlockIterator it = block.getIterator();
+            BlockIterator block_it = block.getIterator();
             
             int64_t ts;
             double val;
 
-            while (it.next(ts, val)) {
+            while (block_it.next(ts, val)) {
                 if (ts > end) break;
                 if (ts >= start) result.emplace_back(ts, val);
             }
@@ -48,6 +55,8 @@ public:
     }
 
     void save(std::string& filename) {
+        if (!blocks_.empty() && blocks_.back().getCount() < max_block_size_) blocks_.back().close();
+        
         std::ofstream file(filename, std::ios::binary);
 
         file.write("NANO", 4);
