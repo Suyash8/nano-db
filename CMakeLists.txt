@@ -30,3 +30,6 @@ target_link_libraries(nanodb_tests gtest_main)
 
 add_executable(nanodb_benchmark benchmarks/main.cpp)
 target_include_directories(nanodb_benchmark PRIVATE include)
+
+add_executable(nanodb_shell src/shell.cpp)
+target_include_directories(nanodb_shell PRIVATE include)
