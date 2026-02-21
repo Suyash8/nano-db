@@ -27,3 +27,6 @@ add_executable(nanodb_tests
 target_include_directories(nanodb_tests PRIVATE include)
 
 target_link_libraries(nanodb_tests gtest_main)
+
+add_executable(nanodb_benchmark benchmarks/main.cpp)
+target_include_directories(nanodb_benchmark PRIVATE include)
