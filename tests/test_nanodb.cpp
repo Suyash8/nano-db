@@ -47,3 +47,18 @@ TEST(NanoDB, SaveAndLoad) {
     EXPECT_EQ(queryResult[2].first, 1002);
     EXPECT_DOUBLE_EQ(queryResult[2].second, 12.0);
 };
+
+TEST(NanoDB, BinarySearchOptimization) {
+    NanoDB db(10);
+
+    for (int i = 0; i < 10000; ++i)
+        db.insert(i, static_cast<double>(i));
+    
+    auto queryResult = db.query(9950, 9960);
+
+    ASSERT_EQ(queryResult.size(), 11);
+    for (int i = 0; i <= 10; ++i) {
+        EXPECT_EQ(queryResult[i].first, 9950 + i);
+        EXPECT_DOUBLE_EQ(queryResult[i].second, static_cast<double>(9950 + i));
+    }
+};
