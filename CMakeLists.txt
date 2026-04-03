@@ -33,3 +33,9 @@ target_include_directories(nanodb_benchmark PRIVATE include)
 
 add_executable(nanodb_shell src/shell.cpp)
 target_include_directories(nanodb_shell PRIVATE include)
+
+add_executable(nanodb_server src/server.cpp)
+target_include_directories(nanodb_server PRIVATE include)
+if(WIN32)
+    target_link_libraries(nanodb_server ws2_32)
+endif()
