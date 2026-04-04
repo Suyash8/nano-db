@@ -2,6 +2,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <thread>
 
 // Platform-specific includes
 #ifdef _WIN32
@@ -77,6 +78,27 @@ SOCKET setupServer(int port) {
     return server_fd;
 }
 
+void handleClient(SOCKET client_socket, struct sockaddr_in client_address, CommandDispatcher& dispatcher) {
+    while (true) {
+        char buffer[1024];
+        memset(buffer, 0, sizeof(buffer));
+
+        int bytes_read = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+
+        if (bytes_read <= 0) break;
+
+        std::string request(buffer, bytes_read);
+        std::string response = dispatcher.dispatch(request);
+        response += "\n";
+
+        send(client_socket, response.c_str(), response.size(), 0);
+    }
+
+    CLOSE_SOCKET(client_socket);
+
+    std::cout << "Connection closed from " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) << std::endl;
+}
+
 int main() {
     NanoDB db;
     CommandDispatcher dispatcher(db);
@@ -88,6 +110,7 @@ int main() {
         socklen_t client_len = sizeof(client_address);
 
         std::cout << "Waiting for connection..." << std::endl;
+
         SOCKET client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_len);
 
         if (!IS_VALID_SOCKET(client_socket)) {
@@ -97,24 +120,8 @@ int main() {
 
         std::cout << "Connection accepted from " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) << std::endl;
 
-        while (true) {
-            char buffer[1024];
-            memset(buffer, 0, sizeof(buffer));
-
-            int bytes_read = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
-
-            if (bytes_read <= 0) break;
-
-            std::string request(buffer, bytes_read);
-            std::string response = dispatcher.dispatch(request);
-            response += "\n";
-
-            send(client_socket, response.c_str(), response.size(), 0);
-        }
-
-        CLOSE_SOCKET(client_socket);
-
-        std::cout << "Connection closed from " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) << std::endl;
+        std::thread client_thread(handleClient, client_socket, client_address, std::ref(dispatcher));
+        client_thread.detach();
     }
 
     // Cleanup
