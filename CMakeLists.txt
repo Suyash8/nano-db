@@ -12,5 +12,30 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(nanodb_tests tests/test_main.cpp)
+add_executable(nanodb_tests 
+    tests/test_main.cpp
+    tests/test_simple_ts.cpp
+    tests/test_bit_writer.cpp
+    tests/test_bit_reader.cpp
+    tests/test_timestamp_compression.cpp
+    tests/test_timestamp_decompression.cpp
+    tests/test_value_compression.cpp
+    tests/test_time_series_block.cpp
+    tests/test_nanodb.cpp
+)
+
+target_include_directories(nanodb_tests PRIVATE include)
+
 target_link_libraries(nanodb_tests gtest_main)
+
+add_executable(nanodb_benchmark benchmarks/main.cpp)
+target_include_directories(nanodb_benchmark PRIVATE include)
+
+add_executable(nanodb_shell src/shell.cpp)
+target_include_directories(nanodb_shell PRIVATE include)
+
+add_executable(nanodb_server src/server.cpp)
+target_include_directories(nanodb_server PRIVATE include)
+if(WIN32)
+    target_link_libraries(nanodb_server ws2_32)
+endif()
