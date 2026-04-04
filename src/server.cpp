@@ -78,8 +78,45 @@ SOCKET setupServer(int port) {
 }
 
 int main() {
+    NanoDB db;
+    CommandDispatcher dispatcher(db);
+
     SOCKET server_socket = setupServer(8080);
-        
+
+    while (true) {
+        struct sockaddr_in client_address;
+        socklen_t client_len = sizeof(client_address);
+
+        std::cout << "Waiting for connection..." << std::endl;
+        SOCKET client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_len);
+
+        if (!IS_VALID_SOCKET(client_socket)) {
+            std::cerr << "Accept failed" << std::endl;
+            continue; // Try accepting the next connection
+        }
+
+        std::cout << "Connection accepted from " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) << std::endl;
+
+        while (true) {
+            char buffer[1024];
+            memset(buffer, 0, sizeof(buffer));
+
+            int bytes_read = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+
+            if (bytes_read <= 0) break;
+
+            std::string request(buffer, bytes_read);
+            std::string response = dispatcher.dispatch(request);
+            response += "\n";
+
+            send(client_socket, response.c_str(), response.size(), 0);
+        }
+
+        CLOSE_SOCKET(client_socket);
+
+        std::cout << "Connection closed from " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) << std::endl;
+    }
+
     // Cleanup
     CLOSE_SOCKET(server_socket);
 #ifdef _WIN32
