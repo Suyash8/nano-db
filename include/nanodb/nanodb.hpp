@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <fstream>
+#include <mutex>
+#include <shared_mutex>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -14,11 +16,14 @@
 class NanoDB {
     std::vector<TimeSeriesBlock> blocks_;
     size_t max_block_size_;
+    mutable std::shared_mutex rw_lock_;
 
 public:
     NanoDB(size_t max_block_size = 1000) : max_block_size_(max_block_size) {}
 
     void insert(int64_t ts, double val) {
+        std::unique_lock<std::shared_mutex> lock(rw_lock_);
+
         if (blocks_.empty() || blocks_.back().getCount() >= max_block_size_) {
             if (!blocks_.empty()) blocks_.back().close();
             blocks_.emplace_back();
@@ -28,6 +33,8 @@ public:
     }
 
     std::vector<std::pair<int64_t, double>> query(int64_t start, int64_t end) {
+        std::shared_lock<std::shared_mutex> lock(rw_lock_);
+        
         std::vector<std::pair<int64_t, double>> result;
 
         auto it = std::lower_bound(blocks_.begin(), blocks_.end(), start, 
@@ -55,6 +62,8 @@ public:
     }
 
     void save(std::string& filename) {
+        std::unique_lock<std::shared_mutex> lock(rw_lock_);
+
         if (!blocks_.empty() && blocks_.back().getCount() < max_block_size_) blocks_.back().close();
         
         std::ofstream file(filename, std::ios::binary);
@@ -82,6 +91,8 @@ public:
     }
 
     void load(std::string& filename) {
+        std::unique_lock<std::shared_mutex> lock(rw_lock_);
+
         std::ifstream file(filename, std::ios::binary);
 
         if (!file.is_open()) throw std::runtime_error("Could not open file");
@@ -108,5 +119,8 @@ public:
         }
     }
 
-    size_t getBlockCount() { return blocks_.size(); }
+    size_t getBlockCount() { 
+        std::shared_lock<std::shared_mutex> lock(rw_lock_);
+        return blocks_.size();
+    }
 };
