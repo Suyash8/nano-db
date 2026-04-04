@@ -1,8 +1,6 @@
 #include <iostream>
-#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <vector>
 
 #include "nanodb/command_dispatcher.hpp"
 #include "nanodb/nanodb.hpp"

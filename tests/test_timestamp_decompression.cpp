@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "nanodb/bit_writer.hpp"
 #include "nanodb/bit_reader.hpp"
+#include "nanodb/bit_writer.hpp"
 #include "nanodb/timestamp_compressor.hpp"
 #include "nanodb/timestamp_decompressor.hpp"
 

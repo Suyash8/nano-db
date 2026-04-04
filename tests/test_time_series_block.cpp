@@ -1,6 +1,6 @@
+#include <cstdint>
 #include <gtest/gtest.h>
 
-#include "nanodb/bit_writer.hpp"
 #include "nanodb/time_series_block.hpp"
 
 TEST(TimeSeriesBlock, StoresDataAndTracksMetadata) {
@@ -17,7 +17,7 @@ TEST(TimeSeriesBlock, StoresDataAndTracksMetadata) {
 
     block.close();
     ASSERT_NO_THROW(block.getData());
-};
+}
 
 TEST(TimeSeriesBlock, CanReadBackData) {
     TimeSeriesBlock block;
@@ -48,4 +48,4 @@ TEST(TimeSeriesBlock, CanReadBackData) {
 
     // End
     ASSERT_FALSE(it.next(ts, val));
-};
+}

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <vector>
-#include <utility>
+#include <cstddef>
 #include <cstdint>
+#include <utility>
+#include <vector>
 
 class SimpleTimeSeries {
     std::vector<std::pair<int64_t, double>> data;

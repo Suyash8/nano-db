@@ -12,6 +12,7 @@ class TimestampDecompressor {
 
 public:
     TimestampDecompressor(BitReader& reader) : reader_(reader), prev_timestamp_(0), prev_delta_(0), first_(true) {}
+
     int64_t next() {
         if (first_) {
             int64_t timestamp = reader_.readBits(64);
@@ -22,13 +23,13 @@ public:
         }
 
         uint8_t bits = 0;
-        
+
         if (reader_.readBit() == 0) bits = 0;
         else if (reader_.readBit() == 0) bits = 7;
         else if (reader_.readBit() == 0) bits = 9;
         else if (reader_.readBit() == 0) bits = 12;
         else bits = 32;
-        
+
         int64_t dod = reader_.readBits(bits);
 
         if (bits > 0) {

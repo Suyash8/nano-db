@@ -1,40 +1,42 @@
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <functional>
 #include <iostream>
 #include <string>
-#include <cstring>
-#include <vector>
 #include <thread>
 
 // Platform-specific includes
 #ifdef _WIN32
-    #include <winsock2.h>
-    #include <ws2tcpip.h>
-    #pragma comment(lib, "ws2_32.lib")
-    
-    // Helper to close socket on Windows
-    #define CLOSE_SOCKET(s) closesocket(s)
-    
-    // Check if socket is valid
-    #define IS_VALID_SOCKET(s) (s != INVALID_SOCKET)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "ws2_32.lib")
+
+// Helper to close socket on Windows
+#define CLOSE_SOCKET(s) closesocket(s)
+
+// Check if socket is valid
+#define IS_VALID_SOCKET(s) (s != INVALID_SOCKET)
 #else
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <unistd.h>
-    #include <arpa/inet.h>
-    
-    // Helper to close socket on Linux/Mac
-    #define CLOSE_SOCKET(s) close(s)
-    
-    // Check if socket is valid
-    #define IS_VALID_SOCKET(s) (s >= 0)
-    
-    // Map Windows types to standard types
-    #define SOCKET int
-    #define INVALID_SOCKET -1
-    #define SOCKET_ERROR -1
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+// Helper to close socket on Linux/Mac
+#define CLOSE_SOCKET(s) close(s)
+
+// Check if socket is valid
+#define IS_VALID_SOCKET(s) (s >= 0)
+
+// Map Windows types to standard types
+#define SOCKET int
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
 #endif
 
-#include "nanodb/nanodb.hpp"
 #include "nanodb/command_dispatcher.hpp"
+#include "nanodb/nanodb.hpp"
 
 SOCKET setupServer(int port) {
 #ifdef _WIN32

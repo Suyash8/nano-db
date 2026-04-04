@@ -1,7 +1,8 @@
 #pragma once
 
-#include <vector>
+#include <cstddef>
 #include <cstdint>
+#include <vector>
 
 class BitWriter {
     std::vector<uint8_t> buffer_;
@@ -10,6 +11,7 @@ class BitWriter {
 
 public:
     BitWriter() : scratch_(0), bit_count_(0) {}
+
     void writeBit(bool bit) {
         if (bit) scratch_ |= (1 << (7 - bit_count_));
         bit_count_++;

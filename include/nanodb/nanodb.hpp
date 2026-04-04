@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <fstream>
 #include <mutex>
@@ -34,12 +35,12 @@ public:
 
     std::vector<std::pair<int64_t, double>> query(int64_t start, int64_t end) {
         std::shared_lock<std::shared_mutex> lock(rw_lock_);
-        
+
         std::vector<std::pair<int64_t, double>> result;
 
-        auto it = std::lower_bound(blocks_.begin(), blocks_.end(), start, 
+        auto it = std::lower_bound(blocks_.begin(), blocks_.end(), start,
             [](TimeSeriesBlock& block, int64_t val) {
-                return block.getEndTime() < val; 
+                return block.getEndTime() < val;
             });
 
         for (; it != blocks_.end(); ++it) {
@@ -48,7 +49,7 @@ public:
             if (block.getStartTime() > end) break;
 
             BlockIterator block_it = block.getIterator();
-            
+
             int64_t ts;
             double val;
 
@@ -65,7 +66,7 @@ public:
         std::unique_lock<std::shared_mutex> lock(rw_lock_);
 
         if (!blocks_.empty() && blocks_.back().getCount() < max_block_size_) blocks_.back().close();
-        
+
         std::ofstream file(filename, std::ios::binary);
 
         file.write("NANO", 4);
@@ -73,7 +74,7 @@ public:
         size_t size = blocks_.size();
         file.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
-        for (auto &block : blocks_) {
+        for (auto& block : blocks_) {
             int64_t start_time = block.getStartTime();
             file.write(reinterpret_cast<const char*>(&start_time), sizeof(start_time));
 
@@ -103,7 +104,7 @@ public:
 
         size_t count;
         file.read(reinterpret_cast<char*>(&count), sizeof(count));
-        // blocks_.clear();
+        blocks_.clear();
 
         for (size_t i = 0; i < count; ++i) {
             int64_t start_time, end_time, point_count, data_size;
@@ -119,7 +120,7 @@ public:
         }
     }
 
-    size_t getBlockCount() { 
+    size_t getBlockCount() {
         std::shared_lock<std::shared_mutex> lock(rw_lock_);
         return blocks_.size();
     }

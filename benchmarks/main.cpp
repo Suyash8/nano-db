@@ -1,6 +1,5 @@
 #include <chrono>
 #include <iostream>
-#include <vector>
 
 #include "nanodb/nanodb.hpp"
 

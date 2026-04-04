@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
@@ -15,7 +16,8 @@ class BlockIterator {
     size_t current_index_;
 
 public:
-    BlockIterator(const std::vector<uint8_t>& data, size_t count) : reader_(data), ts_dcomp_(reader_), val_dcomp_(reader_), count_(count), current_index_(0) {}
+    BlockIterator(const std::vector<uint8_t>& data, size_t count)
+        : reader_(data), ts_dcomp_(reader_), val_dcomp_(reader_), count_(count), current_index_(0) {}
 
     bool next(int64_t& out_ts, double& out_val) {
         if (current_index_ >= count_) return false;
