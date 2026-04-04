@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <gtest/gtest.h>
 #include <vector>
 
@@ -30,6 +31,7 @@ TEST(BitReader, RoundTrip) {
     BitWriter writer;
     writer.writeBits(0b10110, 5);
     writer.writeBits(0b111, 3);
+    writer.flush();
 
     const auto& bytes = writer.getData();
     BitReader reader(bytes);

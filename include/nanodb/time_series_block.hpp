@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
@@ -20,11 +21,12 @@ class TimeSeriesBlock {
 
 public:
     TimeSeriesBlock() : ts_compressor_(writer_), val_compressor_(writer_), start_time_(0), end_time_(0), count_(0), closed_(false) {}
+
     // Constructor for loading from disk
     TimeSeriesBlock(int64_t start, int64_t end, size_t count, const std::vector<uint8_t>& data)
         : start_time_(start), end_time_(end), count_(count), closed_(true),
-        ts_compressor_(writer_), val_compressor_(writer_) {
-            writer_.setData(data);
+          ts_compressor_(writer_), val_compressor_(writer_) {
+        writer_.setData(data);
     }
 
     void append(int64_t ts, double value) {

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <string>
 
 #include "nanodb/nanodb.hpp"
 
@@ -22,7 +23,7 @@ TEST(NanoDB, HandlesMultipleBlocks) {
     EXPECT_DOUBLE_EQ(queryResult[1].second, 12.0);
     EXPECT_EQ(queryResult[2].first, 1003);
     EXPECT_DOUBLE_EQ(queryResult[2].second, 13.0);
-};
+}
 
 TEST(NanoDB, SaveAndLoad) {
     NanoDB db1;
@@ -46,7 +47,7 @@ TEST(NanoDB, SaveAndLoad) {
     EXPECT_DOUBLE_EQ(queryResult[1].second, 11.0);
     EXPECT_EQ(queryResult[2].first, 1002);
     EXPECT_DOUBLE_EQ(queryResult[2].second, 12.0);
-};
+}
 
 TEST(NanoDB, BinarySearchOptimization) {
     NanoDB db(10);
@@ -61,4 +62,4 @@ TEST(NanoDB, BinarySearchOptimization) {
         EXPECT_EQ(queryResult[i].first, 9950 + i);
         EXPECT_DOUBLE_EQ(queryResult[i].second, static_cast<double>(9950 + i));
     }
-};
+}

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
+
 #include "nanodb/simple_time_series.hpp"
 
 TEST(SimpleTimeSeries, CanAddAndCheckSize) {
