@@ -94,6 +94,30 @@ Concurrency model:
 - **Gorilla XOR Compression**: NanoDB leverages the Gorilla XOR compression algorithm to efficiently store double-precision floating-point values. Instead of storing the full 64-bit IEEE 754 representation for every data point, the engine calculates the XOR difference between the current value and the previous value. Since adjacent values in time-series data tend to be identical or very close, their XOR result often contains many leading and trailing zeros.
 
   When a value is XORed with the previous one, if the result is zero, NanoDB simply writes a single '0' bit. If the result is non-zero, it checks whether the meaningful bits (the non-zero portion) fall within the same bounds as the previous value. If they do, it only stores the meaningful bits. If the bounds change, it stores the new leading zero count, the length of the meaningful bits, and the bits themselves. This bit-packing strategy enables NanoDB to drastically reduce the storage footprint for high-frequency measurements.
+
+  *Here is the core logic that achieves this bit-packing:*
+  ```cpp
+  uint64_t xor_val = val_bits ^ prev_bits_;
+  if (xor_val == 0) {
+      writer_.writeBit(0);
+  } else {
+      int leading = nanodb::countLeadingZeros(xor_val);
+      int trailing = nanodb::countTrailingZeros(xor_val);
+      if (leading >= prev_leading_ && trailing >= prev_trailing_) {
+          writer_.writeBits(0b10, 2);
+          int len = 64 - prev_leading_ - prev_trailing_;
+          writer_.writeBits(xor_val >> prev_trailing_, len);
+      } else {
+          writer_.writeBits(0b11, 2);
+          writer_.writeBits(leading, 5);
+          int len = 64 - leading - trailing;
+          writer_.writeBits(len, 6);
+          writer_.writeBits(xor_val >> trailing, len);
+          prev_leading_ = leading;
+          prev_trailing_ = trailing;
+      }
+  }
+  ```
 - **In-memory design**: Data is kept in memory; this keeps code simple and fast for this project size, but it is not designed as a full persistent engine.
 
 ## Performance
