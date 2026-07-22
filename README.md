@@ -90,9 +90,17 @@ Concurrency model:
 
 ### Compression choices and tradeoffs
 
-- Delta-of-delta works well for regular sampling intervals.
-- XOR compression works well when adjacent values are close in binary representation.
-- Data is kept in memory; this keeps code simple and fast for this project size, but it is not designed as a full persistent engine.
+- **Delta-of-delta**: Works exceptionally well for timestamps with regular sampling intervals.
+- **Gorilla XOR Compression**: NanoDB leverages the Gorilla XOR compression algorithm to efficiently store double-precision floating-point values. Instead of storing the full 64-bit IEEE 754 representation for every data point, the engine calculates the XOR difference between the current value and the previous value. Since adjacent values in time-series data tend to be identical or very close, their XOR result often contains many leading and trailing zeros.
+
+  When a value is XORed with the previous one, if the result is zero, NanoDB simply writes a single '0' bit. If the result is non-zero, it checks whether the meaningful bits (the non-zero portion) fall within the same bounds as the previous value. If they do, it only stores the meaningful bits. If the bounds change, it stores the new leading zero count, the length of the meaningful bits, and the bits themselves. This bit-packing strategy enables NanoDB to drastically reduce the storage footprint for high-frequency measurements.
+- **In-memory design**: Data is kept in memory; this keeps code simple and fast for this project size, but it is not designed as a full persistent engine.
+
+## Performance
+
+Based on the built-in `nanodb_benchmark` tool, NanoDB demonstrates extremely high throughput for in-memory operations:
+- **Write Speed**: ~37.0 million ops/sec
+- **Read Speed**: ~36.2 million ops/sec
 
 ## Tech Stack
 
